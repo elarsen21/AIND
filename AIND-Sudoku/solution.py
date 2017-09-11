@@ -168,11 +168,9 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    # see Coding The Solution, Norvig
     values = grid_values(grid)
 
     search(values)
-    # solve diagonals?
 
     return values
 
