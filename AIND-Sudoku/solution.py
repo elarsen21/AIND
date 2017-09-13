@@ -33,8 +33,8 @@ def naked_twins(values):
         for box in values[peer]:
             if len(box) == 2:
                 peer_twins.update(peer, box)
-        # all_twins = (k for k, v in peer_twins.items() if peer_twins.values().count(v) > 1)
-        all_twins.append(peer_twins) # THAT APPEAR TWICE...
+        all_twins = (k for k, v in peer_twins.items() if peer_twins.values().count(v) > 1)
+        # all_twins.append(peer_twins) # WITH SAME VALUE APPEARING TWICE...
 
     # Eliminate the naked twins as possibilities for their peers
     for twin in all_twins:
