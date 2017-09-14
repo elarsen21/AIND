@@ -27,19 +27,21 @@ def naked_twins(values):
     """
     # Find all instances of naked twins
     all_twins = []
-
-    for key, peer in peers.items():
+    for key in peers.keys():
         peer_twins = {}
-        for box in values[peer]:
-            if len(box) == 2:
-                peer_twins.update(peer, box)
+        for peer in peers[key]:
+            for box in values[peer]:
+                if len(box) == 2:
+                    peer_twins.update(peer, box)
+        # add peer_twins key to all_twins if the value appears at least twice
         all_twins = (k for k, v in peer_twins.items() if peer_twins.values().count(v) > 1)
-        # all_twins.append(peer_twins) # WITH SAME VALUE APPEARING TWICE...
 
     # Eliminate the naked twins as possibilities for their peers
     for twin in all_twins:
         for peer in peers[twin]:
-            values[peer].replace(values[twin], '')
+            if peer not in all_twins: # don't delete digits from twins
+                for digit in values[twin]:
+                    values[peer].replace(digit, '')  # replace each digit from twins rather than the string of two digits
 
     return values
 
@@ -177,7 +179,7 @@ def solve(grid):
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(solve(diag_sudoku_grid))
+    #display(solve(diag_sudoku_grid))
 
     try:
         from visualize import visualize_assignments
