@@ -29,21 +29,18 @@ def naked_twins(values):
     # Find all instances of naked twins
     all_twins = []
     for key in peers.keys():
-        peer_twins = {}
+        peer_twins = []
         for peer in peers[key]:
-            if len(values[peer]) == 2:
-                peer_twins[peer] = values[peer]
-        # add peer_twins key to all_twins if the value appears at least twice
-        c = Counter(peer_twins.values())
-        all_twins += [k for k, v in peer_twins.items() if c[v] > 1]
+            if len(values[peer]) == 2 and values[peer] == values[key]:
+                all_twins.append((key, peer))
 
-    all_twins = set(all_twins)
     # Eliminate the naked twins as possibilities for their peers
-    for twin in all_twins:
-        for peer in peers[twin]:
-            if peer not in all_twins: # don't delete digits from twins
-                for digit in values[twin]:
-                    values[peer] = value[peer].replace(digit, '')  # replace each digit from twins rather than the string of two digits
+    for twinpair in all_twins:
+        for key in values.keys():
+            if key in peers[twinpair[0]] and key in peers[twinpair[1]] and key not in twinpair:
+                for twin in twinpair:
+                    for digit in values[twin]:
+                        values[key] = values[key].replace(digit, '')
 
     return values
 
