@@ -1,4 +1,5 @@
 assignments = []
+from collections import Counter
 
 
 def assign_value(values, box, value):
@@ -30,12 +31,13 @@ def naked_twins(values):
     for key in peers.keys():
         peer_twins = {}
         for peer in peers[key]:
-            for box in values[peer]:
-                if len(box) == 2:
-                    peer_twins.update(peer, box)
+            if len(values[peer]) == 2:
+                peer_twins[peer] = values[peer]
         # add peer_twins key to all_twins if the value appears at least twice
-        all_twins = (k for k, v in peer_twins.items() if peer_twins.values().count(v) > 1)
+        c = Counter(peer_twins.values())
+        all_twins += [k for k, v in peer_twins.items() if c[v] > 1]
 
+    all_twins = set(all_twins)
     # Eliminate the naked twins as possibilities for their peers
     for twin in all_twins:
         for peer in peers[twin]:
