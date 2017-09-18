@@ -43,7 +43,7 @@ def naked_twins(values):
         for peer in peers[twin]:
             if peer not in all_twins: # don't delete digits from twins
                 for digit in values[twin]:
-                    values[peer].replace(digit, '')  # replace each digit from twins rather than the string of two digits
+                    values[peer] = value[peer].replace(digit, '')  # replace each digit from twins rather than the string of two digits
 
     return values
 
