@@ -213,7 +213,7 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        def terminal_test(game, depth):
+        def terminal_test(self, game, depth):
             """ Return True if the game is over for the active player
             and False otherwise.
             """
@@ -222,35 +222,33 @@ class MinimaxPlayer(IsolationPlayer):
             if not game.get_legal_moves() or depth == 0:
                 return self.score(game, self)
 
-        def min_value(game, depth):
+        def min_value(self, game, depth):
             """ Return the value for a win (+1) if the game is over,
             otherwise return the minimum value over all legal child
             nodes.
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            if terminal_test(game, depth):
-                return 1
+            terminal_test(self, game, depth)
             v = float("inf")
             for move in game.get_legal_moves():
-                v = min(v, max_value(game.forecast_move(move), depth - 1))
+                v = min(v, max_value(self, game.forecast_move(move), depth - 1))
             return v
 
-        def max_value(game, depth):
+        def max_value(self, game, depth):
             """ Return the value for a loss (-1) if the game is over,
             otherwise return the maximum value over all legal child
             nodes.
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            if terminal_test(game, depth):
-                return -1
+            terminal_test(self, game, depth)
             v = float("-inf")
             for move in game.get_legal_moves():
-                v = max(v, min_value(game.forecast_move(move), depth - 1))
+                v = max(v, min_value(self, game.forecast_move(move), depth - 1))
             return v
 
-        def minimax_decision(game, depth):
+        def minimax_decision(self, game, depth):
             """ Return the move along a branch of the game tree that
             has the best possible value.  A move is a pair of coordinates
             in (column, row) order corresponding to a legal move for
@@ -264,13 +262,13 @@ class MinimaxPlayer(IsolationPlayer):
             best_score = float("-inf")
             best_move = None
             for move in game.get_legal_moves():
-                v = min_value(game.forecast_move(move), depth - 1)
+                v = min_value(self, game.forecast_move(move), depth - 1)
                 if v > best_score:
                     best_score = v
                     best_move = move
             return best_move
 
-        return minimax_decision(game, depth)
+        return minimax_decision(self, game, depth)
 
 
 class AlphaBetaPlayer(IsolationPlayer):
