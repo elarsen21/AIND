@@ -210,7 +210,6 @@ class MinimaxPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
-        # USE DEPTH!
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
@@ -221,7 +220,7 @@ class MinimaxPlayer(IsolationPlayer):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
             if not game.get_legal_moves() or depth == 0:
-                return self.score(game, self) # ?
+                return self.score(game, self)
 
         def min_value(game, depth):
             """ Return the value for a win (+1) if the game is over,
@@ -262,12 +261,14 @@ class MinimaxPlayer(IsolationPlayer):
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            v = float("-inf")
-            all_moves = {}
+            best_score = float("-inf")
+            best_move = None
             for move in game.get_legal_moves():
-                v = max(v, min_value(game.forecast_move(move), depth - 1))
-                all_moves[move] = v
-            return max(all_moves, key=all_moves.get)
+                v = min_value(game.forecast_move(move), depth - 1)
+                if v > best_score:
+                    best_score = v
+                    best_move = move
+            return best_move
 
         return minimax_decision(game, depth)
 
