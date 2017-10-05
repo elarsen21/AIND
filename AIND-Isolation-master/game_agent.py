@@ -219,8 +219,7 @@ class MinimaxPlayer(IsolationPlayer):
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            self.search_depth = depth
-            if not game.get_legal_moves() or self.search_depth == 0:
+            if not game.get_legal_moves() or depth == 0:
                 return self.score(game, self)
 
         def min_value(self, game, depth):
@@ -230,11 +229,10 @@ class MinimaxPlayer(IsolationPlayer):
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            self.search_depth = depth
-            terminal_test(self, game, self.search_depth)
+            terminal_test(self, game, depth)
             v = float("inf")
             for move in game.get_legal_moves():
-                v = min(v, max_value(self, game.forecast_move(move), self.search_depth - 1))
+                v = min(v, max_value(self, game.forecast_move(move), depth - 1))
             return v
 
         def max_value(self, game, depth):
@@ -244,11 +242,10 @@ class MinimaxPlayer(IsolationPlayer):
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            self.search_depth = depth
-            terminal_test(self, game, self.search_depth)
+            terminal_test(self, game, depth)
             v = float("-inf")
             for move in game.get_legal_moves():
-                v = max(v, min_value(self, game.forecast_move(move), self.search_depth - 1))
+                v = max(v, min_value(self, game.forecast_move(move), depth - 1))
             return v
 
         def minimax_decision(self, game, depth):
@@ -262,17 +259,16 @@ class MinimaxPlayer(IsolationPlayer):
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            self.search_depth = depth
             best_score = float("-inf")
             best_move = None
             for move in game.get_legal_moves():
-                v = min_value(self, game.forecast_move(move), self.search_depth - 1)
+                v = min_value(self, game.forecast_move(move), depth - 1)
                 if v > best_score:
                     best_score = v
                     best_move = move
             return best_move
 
-        return minimax_decision(self, game, self.search_depth)
+        return minimax_decision(self, game, depth)
 
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -384,8 +380,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             """
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            self.search_depth = depth
-            if not game.get_legal_moves() or self.search_depth == 0:
+            if not game.get_legal_moves() or depth == 0:
                 return self.score(game, self)
 
         def alphabeta_search(self, game, depth, alpha, beta):
@@ -403,7 +398,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         def max_value(self, game, depth, alpha, beta):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            terminal_test(self, game, self.search_depth)
+            terminal_test(self, game, depth)
             v = float("-inf")
             for move in game.get_legal_moves():
                 v = max(v, min_value(self, game.forecast_move(move), depth, alpha, beta))
@@ -415,7 +410,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         def min_value(self, game, depth, alpha, beta):
             if self.time_left() < self.TIMER_THRESHOLD:
                 raise SearchTimeout()
-            terminal_test(self, game, self.search_depth)
+            terminal_test(self, game, depth)
             v = float("inf")
             for move in game.get_legal_moves():
                 v = min(v, max_value(self, game.forecast_move(move), depth, alpha, beta))
@@ -424,4 +419,4 @@ class AlphaBetaPlayer(IsolationPlayer):
                 beta = min(beta, v)
             return v
 
-        return alphabeta_search(self, game, self.search_depth, float("-inf"), float("inf"))
+        return alphabeta_search(self, game, depth, float("-inf"), float("inf"))
