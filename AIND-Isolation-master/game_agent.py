@@ -3,6 +3,7 @@ test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
 import random
+import itertools
 
 
 class SearchTimeout(Exception):
@@ -316,15 +317,14 @@ class AlphaBetaPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            return self.alphabeta(game, self.search_depth, float("-inf"), float("inf"))
+            for depth in itertools.count():
+                result = self.alphabeta(game, depth, float("-inf"), float("inf"))
 
         except SearchTimeout:
-            pass  # Handle any actions required after timeout as needed
+            pass
 
         # Return the best move from the last completed search iteration
         return best_move
-
-        # TODO: Implement iterative deepening!
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
@@ -389,7 +389,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             best_score = float("-inf")
             best_move = None
             for move in game.get_legal_moves():
-                v = max_value(self, game.forecast_move(move), depth, alpha, beta)
+                v = min_value(self, game.forecast_move(move), depth - 1, alpha, beta)
                 if v > best_score:
                     best_score = v
                     best_move = move
@@ -401,7 +401,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             terminal_test(self, game, depth)
             v = float("-inf")
             for move in game.get_legal_moves():
-                v = max(v, min_value(self, game.forecast_move(move), depth, alpha, beta))
+                v = max(v, min_value(self, game.forecast_move(move), depth - 1, alpha, beta))
                 if v >= beta:
                     return v
                 alpha = max(alpha, v)
@@ -413,7 +413,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             terminal_test(self, game, depth)
             v = float("inf")
             for move in game.get_legal_moves():
-                v = min(v, max_value(self, game.forecast_move(move), depth, alpha, beta))
+                v = min(v, max_value(self, game.forecast_move(move), depth - 1, alpha, beta))
                 if v >= alpha:
                     return v
                 beta = min(beta, v)
