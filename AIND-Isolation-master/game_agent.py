@@ -35,8 +35,16 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    # REFLEKTOR
+    x, y = game.get_player_location(game.get_opponent(player))
+    w, h = game.width / 2., game.height / 2.
+    return float((h - y) + (w - x))
 
 
 def custom_score_2(game, player):
@@ -61,8 +69,15 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    return float(-len(game.get_legal_moves(player)))
+    # moves_made = len(game.play(player).move_history)
+    # return float(open_spaces + moves_made)
 
 
 def custom_score_3(game, player):
@@ -87,8 +102,15 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves -  2 * opp_moves)
 
 
 class IsolationPlayer:
@@ -313,14 +335,14 @@ class AlphaBetaPlayer(IsolationPlayer):
         # Initialize the best move so that this function returns something
         # in case the search fails due to timeout
         best_move = (-1, -1)
-        depth = self.search_depth
+        depth = 1
 
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
             while True:
                 best_move = self.alphabeta(game, depth, float("-inf"), float("inf"))
-                depth -= 1
+                depth += 1
 
         except SearchTimeout:
             pass
