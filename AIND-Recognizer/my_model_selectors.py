@@ -110,7 +110,7 @@ class SelectorCV(ModelSelector):
         # best number of components in min_n_components to max_n_components range
         if len(self.sequences) >= 2:
             best_score = 0
-            best_num_components = 0
+            best_num_components = self.n_constant
             for num_components in range(self.min_n_components, self.max_n_components + 1):
                 try:
                     total_score = 0
@@ -133,7 +133,7 @@ class SelectorCV(ModelSelector):
             return self.base_model(best_num_components)
         else:
             best_score = 0
-            best_num_components = 0
+            best_num_components = self.n_constant
             for num_components in range(self.min_n_components, self.max_n_components + 1):
                 try:
                     a_model = self.base_model(num_components)
