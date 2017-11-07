@@ -115,8 +115,9 @@ class SelectorCV(ModelSelector):
         best_score = 0
         best_num_components = 0
         for num_components in range(self.min_n_components, self.max_n_components + 1):
-            GaussianHMM(num_components).fit(training_sequences)
-            score = GaussianHMM(num_components).score(testing_sequences)
+            a_model = self.base_model(num_components)
+            a_model.fit(training_sequences)
+            score = a_model.score(testing_sequences)
             if score > best_score:
                 best_num_components = num_components
         return self.base_model(best_num_components)
