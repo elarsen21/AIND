@@ -108,16 +108,40 @@ class SelectorCV(ModelSelector):
 
         # TODO implement model selection using CV
         # best number of components in min_n_components to max_n_components range
-        kf = KFold(n_splits = 2)
-        for train_index, test_index in kf.split(self.sequences):
-            training_sequences = combine_sequences(train_index, self.sequences)
-            testing_sequences = combine_sequences(test_index, self.sequences)
-        best_score = 0
-        best_num_components = 0
-        for num_components in range(self.min_n_components, self.max_n_components + 1):
-            a_model = self.base_model(num_components)
-            a_model.fit(training_sequences)
-            score = a_model.score(testing_sequences)
-            if score > best_score:
-                best_num_components = num_components
-        return self.base_model(best_num_components)
+        if len(self.sequences) >= 2:
+            best_score = 0
+            best_num_components = 0
+            for num_components in range(self.min_n_components, self.max_n_components + 1):
+                try:
+                    total_score = 0
+                    qty = 0
+                    kf = KFold(n_splits = 2)
+                    for train_index, test_index in kf.split(self.sequences):
+                        x_train, length_train = combine_sequences(train_index, self.sequences)
+                        x_test, length_test = combine_sequences(train_index, self.sequences)
+                        a_model = self.base_model(num_components)
+                        a_model.fit(x_train, length_train)
+                        score = a_model.score(x_test, length_test)
+                        total_score += score
+                        qty += 1
+                    avg_score = total_score / qty
+                    if avg_score > best_score:
+                        best_score = avg_score
+                        best_num_components = num_components
+                except:
+                    pass
+            return self.base_model(best_num_components)
+        else:
+            best_score = 0
+            best_num_components = 0
+            for num_components in range(self.min_n_components, self.max_n_components + 1):
+                try:
+                    a_model = self.base_model(num_components)
+                    a_model.fit(self.X, self.lengths)
+                    score = a_model.score(self.X, self.lengths)
+                    if score > best_score:
+                        best_score = score
+                        best_num_components = num_components
+                except:
+                    pass
+            return self.base_model(best_num_components)
