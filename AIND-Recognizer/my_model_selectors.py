@@ -77,7 +77,7 @@ class SelectorBIC(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         # TODO implement model selection based on BIC scores
-        bic_lighter = float("-inf")
+        bic_lighter = float("inf")
         best_num_components = self.n_constant
         for num_components in range(self.min_n_components, self.max_n_components + 1):
             try:
@@ -107,18 +107,18 @@ class SelectorDIC(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         # TODO implement model selection based on DIC scores
-        lowest_dic = float("-inf")
+        lowest_dic = float("inf")
         best_num_components = self.n_constant
-        other_words_score = 0
         for num_components in range(self.min_n_components, self.max_n_components + 1):
             try:
                 model = self.base_model(num_components)
-                # DIC = actual_word_score - (1 / (total_words_qty-1)) * sum(rest_words_score)
-                for word in self.words:
+                this_word_score = model.score(self.X, self.lengths)
+                sum_other_words_score = 0
+                for word in self.words.keys():
                     if word != self.this_word:
-                        other_model = self.base_model(num_components)  # WHAT'S DIFFERENT FROM BASE_MODEL?
-                        other_words_score += other_model.score(self.X, self.lengths)  # DOES THAT WORK?
-                dic_score = model.score(self.X, self.lengths) - (1 / (len(self.words) - 1)) * other_words_score
+                        Y, Ylengths = self.hwords[word]
+                        sum_other_words_score += model.score(Y, Ylengths)
+                dic_score = this_word_score - (sum_other_words_score / (len(self.words) - 1))
                 if dic_score < lowest_dic:
                     lowest_dic = dic_score
                     best_num_components = num_components
@@ -149,7 +149,7 @@ class SelectorCV(ModelSelector):
                         x_train, length_train = combine_sequences(train_index, self.sequences)
                         x_test, length_test = combine_sequences(train_index, self.sequences)
                         a_model = self.base_model(num_components)
-                        a_model.fit(x_train, length_train) # WAS IT ALREADY FIT?
+                        a_model.fit(x_train, length_train)
                         score = a_model.score(x_test, length_test)
                         total_score += score
                         qty += 1
