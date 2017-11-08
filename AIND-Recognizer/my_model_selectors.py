@@ -77,8 +77,21 @@ class SelectorBIC(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         # TODO implement model selection based on BIC scores
-        # return self.base_model(best_num_components)
-        raise NotImplementedError
+        bic_lighter = float("-inf")
+        best_num_components = self.n_constant
+        for num_components in range(self.min_n_components, self.max_n_components + 1):
+            try:
+                model = self.base_model(num_components)
+                parameters =  num_components * num_components + (2 * num_components * len(self.X[0]) - 1)
+                logL = model.score(self.X, self.lengths)
+                logN = math.log(len(self.X))
+                bic = -2 * logL + parameters * logN
+                if bic < bic_lighter:
+                    bic_lighter = bic
+                    best_num_components = num_components
+            except:
+                pass
+        return self.base_model(best_num_components)
 
 class SelectorDIC(ModelSelector):
     ''' select best model based on Discriminative Information Criterion
@@ -94,8 +107,24 @@ class SelectorDIC(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         # TODO implement model selection based on DIC scores
-        # return self.base_model(best_num_components)
-        raise NotImplementedError
+        lowest_dic = float("-inf")
+        best_num_components = self.n_constant
+        other_words_score = 0
+        for num_components in range(self.min_n_components, self.max_n_components + 1):
+            try:
+                model = self.base_model(num_components)
+                # DIC = actual_word_score - (1 / (total_words_qty-1)) * sum(rest_words_score)
+                for word in self.words:
+                    if word != self.this_word:
+                        other_model = self.base_model(num_components)  # WHAT'S DIFFERENT FROM BASE_MODEL?
+                        other_words_score += other_model.score(self.X, self.lengths)  # DOES THAT WORK?
+                dic_score = model.score(self.X, self.lengths) - (1 / (len(self.words) - 1)) * other_words_score
+                if dic_score < lowest_dic:
+                    lowest_dic = dic_score
+                    best_num_components = num_components
+            except:
+                pass
+        return self.base_model(best_num_components)
 
 
 class SelectorCV(ModelSelector):
@@ -120,7 +149,7 @@ class SelectorCV(ModelSelector):
                         x_train, length_train = combine_sequences(train_index, self.sequences)
                         x_test, length_test = combine_sequences(train_index, self.sequences)
                         a_model = self.base_model(num_components)
-                        a_model.fit(x_train, length_train)
+                        a_model.fit(x_train, length_train) # WAS IT ALREADY FIT?
                         score = a_model.score(x_test, length_test)
                         total_score += score
                         qty += 1
