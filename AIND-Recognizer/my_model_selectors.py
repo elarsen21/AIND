@@ -107,7 +107,7 @@ class SelectorDIC(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         # TODO implement model selection based on DIC scores
-        lowest_dic = float("inf")
+        highest_dic = float("-inf")
         best_num_components = self.n_constant
         for num_components in range(self.min_n_components, self.max_n_components + 1):
             try:
@@ -119,8 +119,8 @@ class SelectorDIC(ModelSelector):
                         Y, Ylengths = self.hwords[word]
                         sum_other_words_score += model.score(Y, Ylengths)
                 dic_score = this_word_score - (sum_other_words_score / (len(self.words) - 1))
-                if dic_score < lowest_dic:
-                    lowest_dic = dic_score
+                if dic_score > highest_dic:
+                    highest_dic = dic_score
                     best_num_components = num_components
             except:
                 pass
@@ -144,13 +144,13 @@ class SelectorCV(ModelSelector):
                 try:
                     total_score = 0
                     qty = 0
-                    kf = KFold(n_splits = 2)
+                    kf = KFold(n_splits = min(len(self.sequences), 3))
                     for train_index, test_index in kf.split(self.sequences):
                         x_train, length_train = combine_sequences(train_index, self.sequences)
-                        x_test, length_test = combine_sequences(train_index, self.sequences)
-                        a_model = self.base_model(num_components)
-                        a_model.fit(x_train, length_train)
-                        score = a_model.score(x_test, length_test)
+                        x_test, length_test = combine_sequences(test_index, self.sequences)
+                        cv_model = GaussianHMM(n_components=num_components, covariance_type="diag", n_iter=1000,
+                                random_state=self.random_state, verbose=False).fit(x_train, length_train)
+                        score = cv_model.score(x_test, length_test)
                         total_score += score
                         qty += 1
                     avg_score = total_score / qty
@@ -165,9 +165,8 @@ class SelectorCV(ModelSelector):
             best_num_components = self.n_constant
             for num_components in range(self.min_n_components, self.max_n_components + 1):
                 try:
-                    a_model = self.base_model(num_components)
-                    a_model.fit(self.X, self.lengths)
-                    score = a_model.score(self.X, self.lengths)
+                    model = self.base_model(num_components)
+                    logL = model.score(self.X, self.lengths)
                     if score > best_score:
                         best_score = score
                         best_num_components = num_components
