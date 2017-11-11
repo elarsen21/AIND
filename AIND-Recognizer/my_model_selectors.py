@@ -138,7 +138,7 @@ class SelectorCV(ModelSelector):
         # TODO implement model selection using CV
         # best number of components in min_n_components to max_n_components range
         if len(self.sequences) >= 2:
-            best_score = 0
+            best_score = float("-inf")
             best_num_components = self.n_constant
             for num_components in range(self.min_n_components, self.max_n_components + 1):
                 try:

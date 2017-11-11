@@ -9,7 +9,7 @@ class AslDb(object):
 
     This class has been designed to provide a convenient interface for individual word data for students in the Udacity AI Nanodegree Program.
 
-    For example, to instantiate and load train/test files using a feature_method 
+    For example, to instantiate and load train/test files using a feature_method
 	definition named features, the following snippet may be used:
         asl = AslDb()
         asl.build_training(tr_file, features)
@@ -293,5 +293,3 @@ def create_hmmlearn_data(dict):
 if __name__ == '__main__':
     asl= AslDb()
     print(asl.df.ix[98, 1])
-
-
