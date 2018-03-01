@@ -50,13 +50,10 @@ def window_transform_text(text, window_size, step_size):
     # containers for input/output pairs
     inputs = []
     outputs = []
-    step = window_size + step_size
-    for i in range(0, len(text), step):
-        idx = i + window_size
+    for i in range(0, len(text)-window_size, step_size):
         inputs.append(text[i : i + window_size])
-        for j in range(step_size):
-            if idx < len(text)+5:
-                outputs.append(text[j + idx])
+        if i + window_size <= len(text):
+            outputs.append(text[i + window_size])
 
     return inputs,outputs
 
