@@ -16806,7 +16806,7 @@ IYQQQgghhBhT/h/Vb77qLgKNcAAAAABJRU5ErkJggg==
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Question 1:</strong> Use the plot above to analyze the performance of each of the attempted architectures.  Which performs best?  Provide an explanation regarding why you think some models perform better than others.</p>
-<p><strong>Answer:</strong></p>
+<p><strong>Answer:</strong> Based on the plot above, all of the models except for model_0 perform fairly well. In terms of best performance on the validation set, it appears that model_3 has the best performance of all the models. Model_0 performs poorly because it fails to represent the temporal dimension richly enough (which the TimeDistributed layer aids with). Model_3 achieves the best performance because it applys multiple recurrent layers along with batch normalization to reduce variance between layers and the time-distributed layer.</p>
 
 </div>
 </div>
@@ -16989,7 +16989,7 @@ Epoch 20/20
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Question 2:</strong> Describe your final model architecture and your reasoning at each step.</p>
-<p><strong>Answer:</strong> I experimented with a few different architectures and went with an "extra-deep" RNN.</p>
+<p><strong>Answer:</strong> I experimented with a few different architectures, including a deep bidirectional RNN, and found that an "extra-deep" RNN gave the best results. Having more recurrent layers allows the network to find more refined patterns within temporal data. After each recurrent layer, I used batch normalization to improve model stability through each step. Finally, I used a TimeDistributed dense layer to more precisely represent the data at each time step.</p>
 
 </div>
 </div>
