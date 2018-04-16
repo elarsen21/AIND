@@ -152,8 +152,9 @@ def final_model(input_dim, units, output_dim=29):
     rnn_layer5 = GRU(units,
         return_sequences=True, implementation=2, name='rnn_fifth_layer')(bn_rnn4)
     bn_rnn5 = BatchNormalization(name='batch_norm5')(rnn_layer5)
+    time_dense = TimeDistributed(Dense(output_dim), name='time_dist')(bn_rnn5)
     # TODO: Add softmax activation layer
-    y_pred = Activation('softmax', name='softmax')(bn_rnn5)
+    y_pred = Activation('softmax', name='softmax')(time_dense)
     # Specify the model
     model = Model(inputs=input_data, outputs=y_pred)
     # TODO: Specify model.output_length
