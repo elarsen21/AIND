@@ -1,15 +1,15 @@
 from keras import backend as K
 from keras.models import Model
-from keras.layers import (BatchNormalization, Conv1D, Dense, Input, 
+from keras.layers import (BatchNormalization, Conv1D, Dense, Input,
     TimeDistributed, Activation, Bidirectional, SimpleRNN, GRU, LSTM)
 
 def simple_rnn_model(input_dim, output_dim=29):
-    """ Build a recurrent network for speech 
+    """ Build a recurrent network for speech
     """
     # Main acoustic input
     input_data = Input(name='the_input', shape=(None, input_dim))
     # Add recurrent layer
-    simp_rnn = GRU(output_dim, return_sequences=True, 
+    simp_rnn = GRU(output_dim, return_sequences=True,
                  implementation=2, name='rnn')(input_data)
     # Add softmax activation layer
     y_pred = Activation('softmax', name='softmax')(simp_rnn)
@@ -20,17 +20,17 @@ def simple_rnn_model(input_dim, output_dim=29):
     return model
 
 def rnn_model(input_dim, units, activation, output_dim=29):
-    """ Build a recurrent network for speech 
+    """ Build a recurrent network for speech
     """
     # Main acoustic input
     input_data = Input(name='the_input', shape=(None, input_dim))
     # Add recurrent layer
     simp_rnn = GRU(units, activation=activation,
         return_sequences=True, implementation=2, name='rnn')(input_data)
-    # TODO: Add batch normalization 
-    bn_rnn = ...
+    # TODO: Add batch normalization
+    bn_rnn = BatchNormalization(name='batch_norm')(simp_rnn)
     # TODO: Add a TimeDistributed(Dense(output_dim)) layer
-    time_dense = ...
+    time_dense = TimeDistributed(Dense(output_dim), name='time_dist')(bn_rnn)
     # Add softmax activation layer
     y_pred = Activation('softmax', name='softmax')(time_dense)
     # Specify the model
@@ -42,13 +42,13 @@ def rnn_model(input_dim, units, activation, output_dim=29):
 
 def cnn_rnn_model(input_dim, filters, kernel_size, conv_stride,
     conv_border_mode, units, output_dim=29):
-    """ Build a recurrent + convolutional network for speech 
+    """ Build a recurrent + convolutional network for speech
     """
     # Main acoustic input
     input_data = Input(name='the_input', shape=(None, input_dim))
     # Add convolutional layer
-    conv_1d = Conv1D(filters, kernel_size, 
-                     strides=conv_stride, 
+    conv_1d = Conv1D(filters, kernel_size,
+                     strides=conv_stride,
                      padding=conv_border_mode,
                      activation='relu',
                      name='conv1d')(input_data)
@@ -58,9 +58,9 @@ def cnn_rnn_model(input_dim, filters, kernel_size, conv_stride,
     simp_rnn = SimpleRNN(units, activation='relu',
         return_sequences=True, implementation=2, name='rnn')(bn_cnn)
     # TODO: Add batch normalization
-    bn_rnn = ...
+    bn_rnn = BatchNormalization(name='batch_norm')(simp_rnn)
     # TODO: Add a TimeDistributed(Dense(output_dim)) layer
-    time_dense = ...
+    time_dense = TimeDistributed(Dense(output_dim), name='time_dist')(bn_rnn)
     # Add softmax activation layer
     y_pred = Activation('softmax', name='softmax')(time_dense)
     # Specify the model
@@ -93,14 +93,19 @@ def cnn_output_length(input_length, filter_size, border_mode, stride,
     return (output_length + stride - 1) // stride
 
 def deep_rnn_model(input_dim, units, recur_layers, output_dim=29):
-    """ Build a deep recurrent network for speech 
+    """ Build a deep recurrent network for speech
     """
     # Main acoustic input
     input_data = Input(name='the_input', shape=(None, input_dim))
     # TODO: Add recurrent layers, each with batch normalization
-    ...
+    rnn_layer1 = GRU(units,
+        return_sequences=True, implementation=2, name='rnn_first_layer')(input_data)
+    bn_rnn1 = BatchNormalization(name='batch_norm1')(rnn_layer1)
+    rnn_layer2 = GRU(units,
+        return_sequences=True, implementation=2, name='rnn_second_layer')(bn_rnn1)
+    bn_rnn2 = BatchNormalization(name='batch_norm2')(rnn_layer2)
     # TODO: Add a TimeDistributed(Dense(output_dim)) layer
-    time_dense = ...
+    time_dense = TimeDistributed(Dense(output_dim), name='time_dist')(bn_rnn2)
     # Add softmax activation layer
     y_pred = Activation('softmax', name='softmax')(time_dense)
     # Specify the model
@@ -115,9 +120,9 @@ def bidirectional_rnn_model(input_dim, units, output_dim=29):
     # Main acoustic input
     input_data = Input(name='the_input', shape=(None, input_dim))
     # TODO: Add bidirectional recurrent layer
-    bidir_rnn = ...
+    bidir_rnn = Bidirectional(LSTM(units, return_sequences=True), merge_mode='concat', name='bidirectional')(input_data)
     # TODO: Add a TimeDistributed(Dense(output_dim)) layer
-    time_dense = ...
+    time_dense = TimeDistributed(Dense(output_dim), name='time_dist')(bidir_rnn)
     # Add softmax activation layer
     y_pred = Activation('softmax', name='softmax')(time_dense)
     # Specify the model
@@ -126,18 +131,32 @@ def bidirectional_rnn_model(input_dim, units, output_dim=29):
     print(model.summary())
     return model
 
-def final_model():
-    """ Build a deep network for speech 
+def final_model(input_dim, units, output_dim=29):
+    """ Build a deep network for speech
     """
     # Main acoustic input
     input_data = Input(name='the_input', shape=(None, input_dim))
     # TODO: Specify the layers in your network
-    ...
+    rnn_layer1 = GRU(units,
+        return_sequences=True, implementation=2, name='rnn_first_layer')(input_data)
+    bn_rnn1 = BatchNormalization(name='batch_norm1')(rnn_layer1)
+    rnn_layer2 = GRU(units,
+        return_sequences=True, implementation=2, name='rnn_second_layer')(bn_rnn1)
+    bn_rnn2 = BatchNormalization(name='batch_norm2')(rnn_layer2)
+    rnn_layer3 = GRU(units,
+        return_sequences=True, implementation=2, name='rnn_third_layer')(bn_rnn2)
+    bn_rnn3 = BatchNormalization(name='batch_norm3')(rnn_layer3)
+    rnn_layer4 = GRU(units,
+        return_sequences=True, implementation=2, name='rnn_fourth_layer')(bn_rnn3)
+    bn_rnn4 = BatchNormalization(name='batch_norm4')(rnn_layer4)
+    rnn_layer5 = GRU(units,
+        return_sequences=True, implementation=2, name='rnn_fifth_layer')(bn_rnn4)
+    bn_rnn5 = BatchNormalization(name='batch_norm5')(rnn_layer5)
     # TODO: Add softmax activation layer
-    y_pred = ...
+    y_pred = Activation('softmax', name='softmax')(bn_rnn5)
     # Specify the model
     model = Model(inputs=input_data, outputs=y_pred)
     # TODO: Specify model.output_length
-    model.output_length = ...
+    model.output_length = lambda x: x
     print(model.summary())
     return model
